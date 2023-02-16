@@ -1,6 +1,6 @@
 - [x] url /config for get and post
-- [ ] download json data 
-- [ ] upload json data
+- [x] download json data 
+- [x] upload json data
 - [x] validate json data
 - [ ] upload to cloud
 - [ ] download from cloud

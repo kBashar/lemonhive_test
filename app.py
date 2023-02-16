@@ -15,20 +15,24 @@ def handle_invalid_usage(error):
     return response
 
 def get_config():
-    return json.dumps({
-    "firstName": "Khyrul",
-    "secondName": "bashar",
-    "ageInYears": 31,
-    "address": "Dhaka",
-    "creditScore": 89.3
-})
+    """
+    Retrives the json data from the storage.
+    Currently it fetches data from local storage. 
+
+    returns a json data
+    """
+    with open("mock_cloud/configuration-file.json", "r") as f:
+        data = json.load(f)
+        return data
 
 def write_config(data):
-    with open("mock_cloud/configuration-file.json") as f:
-        # data_json = json.load(fp=f)
-        # print(data_json)
-        # data_json.append(data)
-        print(data)
+    """
+    Writes given data to a storage. 
+    Currently it only supports local file storage.
+
+    data: json data to write
+    """
+    with open("mock_cloud/configuration-file.json", "w") as f:
         json.dump(data, f)
 
 def validate_data(data) -> bool: 
@@ -76,7 +80,7 @@ def upload_config():
     data = request.get_json()
     print(data)
     if validate_data(data):
-        # write_config(data)
+        write_config(data)
         return data
     else:
         raise InvalidDataFormat("Data format Invalid", status_code=400)
