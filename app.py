@@ -3,12 +3,12 @@ import jsonschema
 from flask import Flask, request, jsonify
 
 from jsonschema.exceptions import ValidationError
-from error.invalid import InvalidDataFormat
+from error.server_exception import ServerException
 
 
 app = Flask(__name__)
 
-@app.errorhandler(InvalidDataFormat)
+@app.errorhandler(ServerException)
 def handle_invalid_usage(error):
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
@@ -21,9 +21,13 @@ def get_config():
 
     returns a json data
     """
-    with open("mock_cloud/configuration-file.json", "r") as f:
-        data = json.load(f)
-        return data
+    try:
+        with open("mock_cloud/configuration-file.json", "r") as f:
+            data = json.load(f)
+            return data
+    except Exception as e:
+        return None
+
 
 def write_config(data):
     """
@@ -59,11 +63,8 @@ def validate_data(data) -> bool:
     }
     try:
         jsonschema.validate(data, schema)
-        print("Data is valid.")
         return True
     except jsonschema.ValidationError as e:
-        print("Data is invalid.")
-        print(e)
         return False
 
 
@@ -73,7 +74,11 @@ def hello_world():
 
 @app.get("/config")
 def download_config():
-    return get_config()
+    data = get_config()
+    if not data:
+        raise ServerException("No data Found", status_code=404)
+    else:
+        return data
 
 @app.post("/config")
 def upload_config():
@@ -83,4 +88,4 @@ def upload_config():
         write_config(data)
         return data
     else:
-        raise InvalidDataFormat("Data format Invalid", status_code=400)
+        raise ServerException("Data format Invalid", status_code=400)
