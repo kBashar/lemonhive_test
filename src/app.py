@@ -1,13 +1,16 @@
 import json
 import jsonschema
-from flask import Flask, request, jsonify, g
+from pathlib import Path
+from flask import Flask, request, jsonify, current_app
 from .error.server_exception import ServerException
 
 
-app = Flask(__name__)
-with app.app_context():
-    g.setdefault("file_path", default="mock_cloud/configuration-file.json")
 
+
+app = Flask(__name__)
+app.config.update({
+        "Defualt_Storage": "mock_cloud/configuration-file.json"
+        })
 
 @app.errorhandler(ServerException)
 def handle_invalid_usage(error):
@@ -23,7 +26,13 @@ def get_config():
     returns a json data
     """
     try:
-        with open("mock_cloud/configuration-file.json", "r") as f:
+        storage = current_app.config.get("Defualt_Storage")
+        
+        filepath = Path(storage)
+        # if there is no file, i.e. there was no upload. we return None.
+        if not filepath.is_file():
+            return None
+        with open(filepath, "r") as f:
             data = json.load(f)
             return data
     except Exception as e:
@@ -37,7 +46,13 @@ def write_config(data):
 
     data: json data to write
     """
-    with open("mock_cloud/configuration-file.json", "w") as f:
+    storage = current_app.config.get("Defualt_Storage")
+    
+    filepath = Path(storage)
+    # if there is no file, let's create a file to store.
+    if not filepath.is_file():
+        filepath.mkdir(parents=True, exist_ok=True)
+    with open(filepath, "w") as f:
         json.dump(data, f)
 
 def validate_data(data) -> bool: 
@@ -70,6 +85,7 @@ def validate_data(data) -> bool:
 
 @app.get("/config")
 def download_config():
+    current_app
     data = get_config()
     if not data:
         raise ServerException("No data Found", status_code=404)

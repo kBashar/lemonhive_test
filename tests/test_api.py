@@ -4,11 +4,13 @@ from src.app import app as api_app
 from flask import g
 
 @pytest.fixture()
-def app():
+def app(tmpdir):
     app = api_app
     app.config.update({
         "TESTING": True,
+        "Default_Storage": tmpdir.join
     })
+
 
     # other setup can go here
 
@@ -29,6 +31,16 @@ def test_data():
         "address": "Dhaka",
         "creditScore": 93.9
     }
+
+# first we test if Not Found 404 works
+
+def test_config_get_not_found(client):
+    """
+        returns a 404 code if the `GET` request cannot find the file in cloud storage
+    """
+    response = client.get("/config")
+    assert response.status_code == 404
+    assert response.json["message"] == "No data Found"
 
 def test_config_post(client, test_data):
     """
@@ -61,11 +73,3 @@ def test_config_get(client, test_data):
     response = client.get("/config")
     assert response.status_code == 200
     assert response.json == test_data
-
-def test_config_get_not_found(client):
-    """
-        returns a 404 code if the `GET` request cannot find the file in cloud storage
-    """
-    response = client.get("/config")
-    assert response.status_code == 404
-    assert response.json["message"] == "No data Found"
