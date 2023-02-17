@@ -6,9 +6,4 @@
 - [x] 404 if no data found in storage
 - [ ] upload to cloud
 - [ ] download from cloud
-- [ ] test code 
-- [ ] automate test code
-- [ ] must accept JSON data (e.g. data:application/json), not file data
-
-
-firebase id: lemonhive-4ada0
+- [x] test code 
