@@ -8,6 +8,7 @@
 - [ ] download from cloud
 - [ ] test code 
 - [ ] automate test code
+- [ ] must accept JSON data (e.g. data:application/json), not file data
 
 
 firebase id: lemonhive-4ada0
