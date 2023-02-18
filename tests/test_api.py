@@ -8,7 +8,7 @@ def app(tmpdir):
     app = api_app
     app.config.update({
         "TESTING": True,
-        "Default_Storage": tmpdir.join
+        "Default_Storage": "test_mock_cloud/configuration-file.json"
     })
 
 

@@ -38,6 +38,19 @@ def get_config():
     except Exception as e:
         return None
 
+def create_config_file(storage_path):
+    try:
+        #create directories
+        index_of_last_path_separator = storage_path.rfind("/")
+        dirs = Path(storage_path[0:index_of_last_path_separator])
+        dirs.mkdir(parents=True, exist_ok=True)
+        # finally create file
+        file_path = Path(storage_path)
+        file_path.touch(exist_ok=True)
+        return True
+    except Exception as e:
+        return False
+
 
 def write_config(data):
     """
@@ -46,12 +59,13 @@ def write_config(data):
 
     data: json data to write
     """
-    storage = current_app.config.get("Defualt_Storage")
-    
-    filepath = Path(storage)
+    storage_path = current_app.config.get("Defualt_Storage")
+    print(storage_path)
+
+    filepath = Path(storage_path)
     # if there is no file, let's create a file to store.
     if not filepath.is_file():
-        filepath.mkdir(parents=True, exist_ok=True)
+        create_config_file(storage_path)
     with open(filepath, "w") as f:
         json.dump(data, f)
 
